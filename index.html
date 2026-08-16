@@ -48,7 +48,7 @@
   --fs-datelbl: clamp(.78rem, 3.2vw, .95rem);  /* EYLÜL / 2026 */
   --fs-dow:     clamp(.70rem, 2.9vw, .84rem);  /* CMT */
   --fs-num:     clamp(2.9rem, 12vw, 3.9rem);   /* 12 */
-  --fs-time:    clamp(.78rem, 3.2vw, .94rem);  /* AKŞAM SAAT 19:00 */
+  --fs-time:    clamp(.78rem, 3.2vw, .94rem);  /* SAAT 19:00 */
   --fs-venue:   clamp(1.02rem, 4.6vw, 1.4rem); /* DÜŞ BAHÇESİ */
   --fs-address: clamp(.82rem, 3.4vw, .98rem);  /* adres */
   --fs-button:  clamp(.72rem, 3vw, .84rem);    /* YOL TARİFİ AL */
@@ -307,15 +307,18 @@ body::after{
 .gate--gone{opacity:0;visibility:hidden;pointer-events:none}
 body.gated{overflow:hidden}
 
+.gate-deco{position:absolute;inset:0;pointer-events:none}
 .gate-floral{
   position:absolute;
-  width:min(48%,300px);
+  width:min(42%,270px);
   mix-blend-mode:multiply;
-  pointer-events:none;
   user-select:none;
 }
-.gate-floral--top{top:0;right:0;transform:rotate(180deg)}
-.gate-floral--bottom{bottom:0;left:0}
+/* one artwork, anchored bottom-left; flipped into each of the four corners */
+.gate-floral--bl{bottom:0;left:0}
+.gate-floral--br{bottom:0;right:0;transform:scaleX(-1)}
+.gate-floral--tl{top:0;left:0;transform:scaleY(-1)}
+.gate-floral--tr{top:0;right:0;transform:rotate(180deg)}
 
 .gate-inner{position:relative;z-index:2;max-width:min(88vw,430px)}
 .gate-eyebrow{
@@ -434,11 +437,11 @@ body.gated{overflow:hidden}
     <div class="content">
 
       <!-- two gently arched lines, as in the printed template -->
-      <svg class="arch reveal" style="animation-delay:.25s" viewBox="0 0 320 76" role="img" aria-label="Ailelerimizin mutluluğuyla">
+      <svg class="arch reveal" style="animation-delay:.25s" viewBox="0 0 320 76" role="img" aria-label="Bir ömür mutluluğa">
         <path id="arch1" d="M26,34 Q160,6 294,34" fill="none"></path>
         <path id="arch2" d="M36,70 Q160,44 284,70" fill="none"></path>
-        <text text-anchor="middle"><textPath href="#arch1" startOffset="50%">AİLELERİMİZİN</textPath></text>
-        <text text-anchor="middle"><textPath href="#arch2" startOffset="50%">MUTLULUĞUYLA</textPath></text>
+        <text text-anchor="middle"><textPath href="#arch1" startOffset="50%">BİR ÖMÜR</textPath></text>
+        <text text-anchor="middle"><textPath href="#arch2" startOffset="50%">MUTLULUĞA</textPath></text>
       </svg>
 
       <h1 class="names reveal" style="animation-delay:.4s">
@@ -462,7 +465,7 @@ body.gated{overflow:hidden}
         <span class="date-side">2026</span>
       </div>
 
-      <p class="time reveal" style="animation-delay:.8s">AKŞAM SAAT 19:00</p>
+      <p class="time reveal" style="animation-delay:.8s">SAAT 19:00</p>
 
       <p class="venue reveal" style="animation-delay:.9s">DÜŞ BAHÇESİ<br>KIR DÜĞÜNÜ</p>
 
@@ -502,14 +505,27 @@ body.gated{overflow:hidden}
      (iOS Safari and the WhatsApp in-app browser both enforce this), so the
      invitation opens behind a tap. That tap is the gesture that starts the music. -->
 <div class="gate" id="gate">
-  <picture class="floral-wrap">
-    <source srcset="assets/floral-corner.webp" type="image/webp">
-    <img class="gate-floral gate-floral--top" src="assets/floral-corner.png" alt="" aria-hidden="true">
-  </picture>
-  <picture class="floral-wrap">
-    <source srcset="assets/floral-corner.webp" type="image/webp">
-    <img class="gate-floral gate-floral--bottom" src="assets/floral-corner.png" alt="" aria-hidden="true">
-  </picture>
+  <!-- Decoration sits in its own out-of-flow layer. As direct grid children
+       the picture/img pairs were generating extra grid rows and pushing the
+       content below centre, even though the images are absolutely positioned. -->
+  <div class="gate-deco" aria-hidden="true">
+    <picture class="floral-wrap">
+      <source srcset="assets/floral-corner.webp" type="image/webp">
+      <img class="gate-floral gate-floral--tl" src="assets/floral-corner.png" alt="">
+    </picture>
+    <picture class="floral-wrap">
+      <source srcset="assets/floral-corner.webp" type="image/webp">
+      <img class="gate-floral gate-floral--tr" src="assets/floral-corner.png" alt="">
+    </picture>
+    <picture class="floral-wrap">
+      <source srcset="assets/floral-corner.webp" type="image/webp">
+      <img class="gate-floral gate-floral--bl" src="assets/floral-corner.png" alt="">
+    </picture>
+    <picture class="floral-wrap">
+      <source srcset="assets/floral-corner.webp" type="image/webp">
+      <img class="gate-floral gate-floral--br" src="assets/floral-corner.png" alt="">
+    </picture>
+  </div>
 
   <div class="gate-inner">
     <p class="gate-eyebrow">DÜĞÜN DAVETİYESİ</p>
