@@ -81,16 +81,41 @@ Her şey `index.html` içinde, düz metin olarak duruyor:
 `text-transform: uppercase` özelliği Türkçe'de `i` harfini `I` yapar (`İ`
 değil), bu yüzden sayfada bilerek kullanılmadı.
 
-### Müziği değiştirme
+### Müzik nasıl çalışıyor (önemli)
 
-Yeni parçayı `assets/music.mp3` olarak koy. Dosyayı küçültmek için:
+**Hiçbir tarayıcı, sayfa açılır açılmaz sesli müzik başlatmaz.** iOS Safari,
+Android Chrome ve WhatsApp'ın kendi içindeki tarayıcı bunu kesin olarak
+engelliyor — bu bir kod eksiği değil, tarayıcı kuralı. Müziğin başlaması için
+kullanıcının **gerçek bir dokunuşu** şart.
+
+Çözüm: davetiye bir **açılış ekranının** arkasında duruyor. Davetli linke
+tıklayınca önce isimlerin olduğu bir kapak görüyor ve **"DAVETİYEYİ AÇ"**
+butonuna basıyor. İşte o dokunuş, tarayıcının istediği izin oluyor — müzik
+başlıyor ve davetiye açılıyor.
+
+Yani pratikte: davetiyeyi açan herkes müziği duyar. Butona basmadan içeriği
+göremediği için "dokunmayı atlama" ihtimali yok.
+
+- Sağ alttaki 🔊 butonu müziği sonradan kapatıp açmaya yarıyor.
+- `preload="auto"` — dokunuş geleceği kesin olduğu için parça önceden yükleniyor,
+  butona basıldığı anda gecikmesiz başlıyor.
+- JavaScript kapalıysa açılış ekranı gizleniyor (`<noscript>`), davetiye yine açılıyor.
+
+### Ses seviyesi ve iPhone
+
+Ses seviyesi **mp3 dosyasının içine gömüldü** (-5 dB), JavaScript ile
+ayarlanmıyor. Sebebi: iOS'ta `audio.volume` salt-okunur — atama sessizce
+görmezden geliniyor. Eskiden JS ile 0.55'e çekiliyordu; bu masaüstünde çalışıp
+iPhone'da çalışmıyordu, yani iPhone'da müzik sonuna kadar açık başlıyordu.
+
+Yeni parça koyarken aynı işlemi uygula:
 
 ```bash
-ffmpeg -i yeni-parca.mp3 -map 0:a -c:a libmp3lame -b:a 96k -ar 44100 assets/music.mp3
+ffmpeg -i yeni-parca.mp3 -map 0:a -af "volume=-5dB" \
+       -c:a libmp3lame -b:a 96k -ar 44100 assets/music.mp3
 ```
 
-96 kbps mobil veri için yeterli — şu anki dosya 2.0 MB. Müzik `preload="none"`
-ile yükleniyor, yani kimse butona basmadan indirilmiyor.
+96 kbps mobil veri için yeterli — şu anki dosya 2.0 MB.
 
 ### Yazı boyutlarını değiştirme
 
@@ -161,8 +186,9 @@ Bu durumda `index.html`'deki `<picture>` bloklarını tek bir
 
 ## Notlar
 
-- **Müzik butonu** sağ altta. Tarayıcılar otomatik çalmayı engellediği için
-  ilk dokunuşla başlıyor, sesi 2 saniyede yumuşakça açıyor.
+- **Müzik** açılış ekranındaki butona basılınca başlıyor; sağ alttaki 🔊 ile
+  kapatılıp açılabiliyor. Sesi 2 saniyede yumuşakça yükseliyor (iOS bu geçişi
+  desteklemiyor, orada direkt başlıyor — sorun değil, seviye dosyada ayarlı).
 - **Yol tarifi** butonu telefonda doğrudan Google Maps uygulamasını açar.
 - Sayfa toplam ~2.2 MB indiriyor (2.0 MB müzik + 61 KB çiçek). PNG yedekleri
   depoda duruyor ama modern tarayıcı indirmiyor.

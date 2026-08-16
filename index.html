@@ -287,6 +287,79 @@ body::after{
   line-height:1.5;
 }
 
+/* ---------------------------------------------------------------- gate */
+
+.gate{
+  position:fixed;
+  inset:0;
+  z-index:60;              /* above the grain layer */
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:26px;
+  background:var(--page);
+  background-image:
+    radial-gradient(circle at 18% 12%, #fbf7ee 0%, transparent 55%),
+    radial-gradient(circle at 82% 88%, #f0e9d9 0%, transparent 60%);
+  isolation:isolate;
+  transition:opacity .8s ease,visibility .8s ease;
+}
+.gate--gone{opacity:0;visibility:hidden;pointer-events:none}
+body.gated{overflow:hidden}
+
+.gate-floral{
+  position:absolute;
+  width:min(48%,300px);
+  mix-blend-mode:multiply;
+  pointer-events:none;
+  user-select:none;
+}
+.gate-floral--top{top:0;right:0;transform:rotate(180deg)}
+.gate-floral--bottom{bottom:0;left:0}
+
+.gate-inner{position:relative;z-index:2;max-width:min(88vw,430px)}
+.gate-eyebrow{
+  font-family:var(--f-caps);
+  font-size:clamp(.64rem,2.7vw,.76rem);
+  font-weight:600;letter-spacing:.26em;text-indent:.26em;
+  color:var(--ink-soft);
+}
+.gate-names{
+  font-family:var(--f-script);
+  font-size:clamp(3.6rem,16vw,5.2rem);
+  line-height:1.04;
+  color:var(--script);
+  margin-top:.12em;
+}
+.gate-names span{
+  display:block;
+  font-family:var(--f-caps);
+  font-size:clamp(.8rem,3vw,.95rem);
+  font-weight:500;letter-spacing:.28em;text-indent:.28em;
+  color:var(--ink);
+  margin:.06em 0;
+}
+.gate-orn{display:block;width:clamp(120px,32vw,168px);margin:clamp(16px,4vw,24px) auto 0}
+.gate-btn{
+  margin-top:clamp(18px,4.5vw,26px);
+  font-family:var(--f-caps);
+  font-size:clamp(.74rem,3vw,.86rem);
+  font-weight:600;letter-spacing:.2em;text-indent:.2em;
+  padding:1em 2.2em;
+  color:var(--ink);
+  background:transparent;
+  border:1px solid var(--gold);
+  cursor:pointer;
+  transition:background .35s ease,color .35s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.gate-btn:hover,.gate-btn:focus-visible{background:var(--gold);color:#fff}
+.gate-note{
+  margin-top:14px;
+  font-size:clamp(.82rem,3.2vw,.95rem);
+  color:var(--ink-soft);
+}
+
 /* ---------------------------------------------------------------- music */
 
 .music{
@@ -346,7 +419,7 @@ body::after{
 }
 </style>
 </head>
-<body>
+<body class="gated">
 
 <main class="card">
   <picture class="floral-wrap">
@@ -424,7 +497,37 @@ body::after{
   </div>
 </main>
 
-<audio id="track" src="assets/music.mp3" loop preload="none"></audio>
+<noscript><style>.gate{display:none}body.gated{overflow:auto}</style></noscript>
+
+<!-- Opening screen. Browsers refuse to start audio without a real user gesture
+     (iOS Safari and the WhatsApp in-app browser both enforce this), so the
+     invitation opens behind a tap. That tap is the gesture that starts the music. -->
+<div class="gate" id="gate">
+  <picture class="floral-wrap">
+    <source srcset="assets/floral-corner.webp" type="image/webp">
+    <img class="gate-floral gate-floral--top" src="assets/floral-corner.png" alt="" aria-hidden="true">
+  </picture>
+  <picture class="floral-wrap">
+    <source srcset="assets/floral-corner.webp" type="image/webp">
+    <img class="gate-floral gate-floral--bottom" src="assets/floral-corner.png" alt="" aria-hidden="true">
+  </picture>
+
+  <div class="gate-inner">
+    <p class="gate-eyebrow">DÜĞÜN DAVETİYESİ</p>
+    <p class="gate-names">Beyza<span>VE</span>Murat</p>
+    <svg class="gate-orn" viewBox="0 0 180 22" aria-hidden="true">
+      <path d="M4 11h58M118 11h58" stroke="#e3d7ba" stroke-width="1"/>
+      <path d="M90 4c-5 3.6-8 5.6-8 7s3 3.4 8 7c5-3.6 8-5.6 8-7s-3-3.4-8-7z" fill="none" stroke="#c0a875" stroke-width="1"/>
+      <circle cx="72" cy="11" r="1.6" fill="#c0a875"/><circle cx="108" cy="11" r="1.6" fill="#c0a875"/>
+    </svg>
+    <button class="gate-btn" id="gateBtn" type="button">DAVETİYEYİ AÇ</button>
+    <p class="gate-note">Müzik eşliğinde açılır</p>
+  </div>
+</div>
+
+<!-- preload="auto": the opening tap is coming, so have the track buffered and
+     ready to start the moment it lands -->
+<audio id="track" src="assets/music.mp3" loop preload="auto"></audio>
 
 <button class="music" id="musicBtn" type="button" aria-pressed="false" aria-label="Müziği çal">
   <svg class="icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -440,12 +543,19 @@ body::after{
 
 <script>
 (function(){
-  var track = document.getElementById('track');
-  var btn   = document.getElementById('musicBtn');
-  var MAX   = 0.55;          // background music, not a concert
+  var track   = document.getElementById('track');
+  var btn     = document.getElementById('musicBtn');
+  var gate    = document.getElementById('gate');
+  var gateBtn = document.getElementById('gateBtn');
   var fade;
 
-  // Ramp the volume instead of cutting it in at full level.
+  /* Playback level is baked into the mp3 (-5 dB) rather than set here, because
+     iOS treats HTMLMediaElement.volume as read-only — assigning to it silently
+     does nothing, so an iPhone would have played at full blast while desktop
+     played softly. The ramp below is a progressive enhancement: it smooths the
+     start where volume is writable, and is simply inert on iOS. */
+  var MAX = 1;
+
   function rampTo(target, ms){
     clearInterval(fade);
     var from = track.volume, steps = Math.max(1, Math.round(ms / 50)), i = 0;
@@ -464,18 +574,28 @@ body::after{
     btn.setAttribute('aria-label', playing ? 'Müziği durdur' : 'Müziği çal');
   }
 
-  btn.addEventListener('click', function(){
+  function start(){
     btn.classList.add('touched');
-    if (track.paused){
-      track.volume = 0;
-      var p = track.play();
-      if (p && p.catch) p.catch(function(){ setState(false); });
-      rampTo(MAX, 2000);
-      setState(true);
-    } else {
-      rampTo(0, 700);
-      setState(false);
-    }
+    track.volume = 0;
+    var p = track.play();
+    // If the browser still refuses, fail quietly: show the button as "off" so a
+    // guest can start it by hand. Never let this block the invitation.
+    if (p && p.catch) p.catch(function(){ clearInterval(fade); setState(false); });
+    rampTo(MAX, 2200);
+    setState(true);
+  }
+
+  function stop(){ rampTo(0, 700); setState(false); }
+
+  gateBtn.addEventListener('click', function(){
+    start();
+    document.body.classList.remove('gated');
+    gate.classList.add('gate--gone');
+    setTimeout(function(){ if (gate.parentNode) gate.parentNode.removeChild(gate); }, 900);
+  });
+
+  btn.addEventListener('click', function(){
+    if (track.paused) start(); else stop();
   });
 
   track.addEventListener('ended', function(){ setState(false); });
