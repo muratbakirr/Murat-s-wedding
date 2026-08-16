@@ -163,7 +163,7 @@ body::after{
   font-family:var(--f-script);
   font-weight:400;
   color:var(--script);
-  line-height:1.05;
+  line-height:1.14;
   font-size:var(--fs-names);
 }
 /* the template sets the joining word as letterspaced caps, not italic */
@@ -175,7 +175,7 @@ body::after{
   letter-spacing:.28em;
   text-indent:.28em; /* offsets the trailing letterspace so it stays centred */
   color:var(--ink);
-  margin:clamp(4px,1.4vw,10px) 0;
+  margin:clamp(12px,3vw,20px) 0;
 }
 
 .invite{
@@ -327,9 +327,11 @@ body.gated{overflow:hidden}
 .gate-names{
   font-family:var(--f-script);
   font-size:clamp(3.6rem,16vw,5.2rem);
-  line-height:1.04;
+  /* roomy leading: Italianno's descenders are long and would otherwise
+     collide with the VE sitting between the two names */
+  line-height:1.16;
   color:var(--script);
-  margin-top:.12em;
+  margin-top:.1em;
 }
 .gate-names span{
   display:block;
@@ -337,7 +339,9 @@ body.gated{overflow:hidden}
   font-size:clamp(.8rem,3vw,.95rem);
   font-weight:500;letter-spacing:.28em;text-indent:.28em;
   color:var(--ink);
-  margin:.06em 0;
+  /* absolute units, not em — em here resolves against this span's own small
+     font-size and would collapse to about a pixel */
+  margin:clamp(12px,3vw,20px) 0;
 }
 .gate-orn{display:block;width:clamp(120px,32vw,168px);margin:clamp(16px,4vw,24px) auto 0}
 .gate-btn{
@@ -354,11 +358,6 @@ body.gated{overflow:hidden}
   -webkit-tap-highlight-color:transparent;
 }
 .gate-btn:hover,.gate-btn:focus-visible{background:var(--gold);color:#fff}
-.gate-note{
-  margin-top:14px;
-  font-size:clamp(.82rem,3.2vw,.95rem);
-  color:var(--ink-soft);
-}
 
 /* ---------------------------------------------------------------- music */
 
@@ -521,7 +520,6 @@ body.gated{overflow:hidden}
       <circle cx="72" cy="11" r="1.6" fill="#c0a875"/><circle cx="108" cy="11" r="1.6" fill="#c0a875"/>
     </svg>
     <button class="gate-btn" id="gateBtn" type="button">DAVETİYEYİ AÇ</button>
-    <p class="gate-note">Müzik eşliğinde açılır</p>
   </div>
 </div>
 
