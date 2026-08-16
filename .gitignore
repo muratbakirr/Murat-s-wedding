@@ -1,0 +1,9 @@
+.DS_Store
+# agent skills installed by `npx skills add` — tooling, not part of the site
+.agents/
+.claude/
+._*
+Thumbs.db
+_probe.html
+_og.html
+skills-lock.json
