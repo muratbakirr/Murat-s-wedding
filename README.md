@@ -4,8 +4,8 @@ Tek sayfalık, statik bir düğün davetiyesi sitesi. Derleme adımı yok — sa
 `index.html` ve `assets/`. Telefonda açılmak üzere tasarlandı (davetliler linki
 WhatsApp'tan açacak).
 
-**Düğün:** 12 Eylül 2026, Cumartesi · 19:00
-**Mekân:** Düş Bahçesi Kır Düğünü — İncek Mah., Turgut Özal Bulvarı, Dural Sok. No:11, 06830 Gölbaşı / Ankara
+**Düğün:** 7 Kasım 2026, Cumartesi · 19:00
+**Mekân:** Kulüp İncek — İncek, Görgülü Sk. 8/A, 06830 Gölbaşı / Ankara
 
 ---
 
@@ -70,7 +70,7 @@ Her şey `index.html` içinde, düz metin olarak duruyor:
 | Ne | Nerede |
 |---|---|
 | İsimler | `<h1 class="names">` |
-| Tarih (EYLÜL / CMT / 12 / 2026) | `<div class="date">` |
+| Tarih (KASIM / CMT / 7 / 2026) | `<div class="date">` |
 | Saat | `<p class="time">` |
 | Mekân ve adres | `<p class="venue">` ve `<p class="address">` |
 | Yol tarifi linki | `<a class="maps" href="...">` |
@@ -126,7 +126,7 @@ CSS'in derinlerini kurcalamana gerek yok — sadece bu satırları düzenle:
 --fs-names:   clamp(4.7rem, 20vw, 7.5rem);   /* Beyza / Murat */
 --fs-invite:  clamp(.74rem, 3.1vw, .9rem);   /* DÜĞÜN TÖRENİMİZDE... */
 --fs-num:     clamp(2.9rem, 12vw, 3.9rem);   /* 12 */
---fs-venue:   clamp(1.02rem, 4.6vw, 1.4rem); /* DÜŞ BAHÇESİ */
+--fs-venue:   clamp(1.02rem, 4.6vw, 1.4rem); /* KULÜP İNCEK */
 --fs-closing: clamp(1.45rem, 5.8vw, 1.95rem);/* kapanış cümlesi */
 ...
 ```
